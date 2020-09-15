@@ -1,11 +1,20 @@
 export const SpaceService = {
   baseUrl: 'https://api.spacexdata.com/v3/launches',
 
-  get (params = {}) {
+  async get (params = {}) {
     let paramsObj = { ...params }
     paramsObj.limit = 100
     let searchParams = new URLSearchParams(paramsObj)
-    return fetch(`${this.baseUrl}?${searchParams}`).then(res => res.json()).then(this.getData)
+    let data = []
+    try {
+      let response = await fetch(`${this.baseUrl}?${searchParams}`)
+      data = this.getData(await response.json())
+      console.log('Data', data)
+    } catch (err) {
+      console.log('err', err)
+      data = []
+    }
+    return data
   },
 
   getData (items) {
