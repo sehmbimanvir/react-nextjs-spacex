@@ -1,5 +1,5 @@
 export const SpaceService = {
-  baseUrl: 'https://api.spacexdata.com/v3/launches',
+  baseUrl: process.env.NEXT_PUBLIC_API_ENDPOINT,
 
   async get (params = {}) {
     let paramsObj = { ...params }
