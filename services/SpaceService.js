@@ -9,7 +9,6 @@ export const SpaceService = {
     try {
       let response = await fetch(`${this.baseUrl}?${searchParams}`)
       data = this.getData(await response.json())
-      console.log('Data', data)
     } catch (err) {
       console.log('err', err)
       data = []
