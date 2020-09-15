@@ -23,3 +23,21 @@
 .card_item_value {
   color: #4f5396;
 }
+
+.card_item_launch {
+    border-radius: 5px;
+    padding: 2px 13px 3px;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.card_item_launch_success {
+  background-color: #76bb0b;
+}
+
+.card_item_launch_failed {
+  background-color: #e74c3c;
+}
