@@ -1,65 +1,95 @@
-import Head from 'next/head'
+import { useEffect, useRef, useState } from 'react'
+import Filters from '../components/Filters'
+import SpaceLaunch from '../components/SpaceLaunch'
+import { SpaceService } from '../services/SpaceService'
+import Context from '../context'
+import { useRouter } from 'next/router'
 import styles from '../styles/Home.module.css'
 
-export default function Home() {
+export const getServerSideProps = async (context) => {
+  let items = []
+  try {
+    items = await SpaceService.get(context.query)
+  } catch (err) { }
+
+  return {
+    props: {
+      items,
+      params: context.query,
+      init: 1
+    }
+  }
+}
+
+const Home = ({ items, params, init }) => {
+  const [spaceItems, setItems] = useState([])
+  const [filters, setFilters] = useState({
+    launch_year: '',
+    launch_success: '',
+    land_success: ''
+  })
+  const [loading, setLoading] = useState(false)
+
+  const router = useRouter()
+  const initialRender = useRef(init)
+
+  useEffect(() => {
+    setFilters(params)
+    setItems(items)
+  }, [])
+
+  useEffect(() => {
+    if (initialRender.current) {
+      initialRender.current = 0
+      return
+    }
+    setLoading(true)
+    SpaceService.get(filters).then(response => {
+      setItems(response)
+      setTimeout(() => {
+        setLoading(false)
+      }, 1000)
+    })
+
+  }, [router.query])
+
+  const contextValue = {
+    setFilter: e => {
+      let { name, checked, value } = e.target
+      value = checked ? value : ''
+      const prevState = { ...filters }
+      prevState[name] = value
+      setFilters(prevState)
+      router.push({
+        pathname: '/',
+        search: new URLSearchParams(prevState)
+      })
+    },
+    filters
+  }
+
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Context.Provider value={contextValue}>
+      <div className="row">
+        <h1 className={styles.site_title}>SpaceX Launch Programs</h1>
+      </div>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
+      <div className="row">
+        <div className="sidebar">
+          <Filters />
         </div>
-      </main>
 
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
+        <div className="space-ships">
+          <SpaceLaunch loading={loading} items={spaceItems} />
+        </div>
+      </div>
+
+      <footer>
+        <p className="text-center"><strong>Developed by: </strong> Manvir Singh</p>
       </footer>
-    </div>
+
+    </Context.Provider>
   )
 }
+
+export default Home
