@@ -46,9 +46,7 @@ const Home = ({ items, params, init }) => {
     setLoading(true)
     SpaceService.get(filters).then(response => {
       setItems(response)
-      setTimeout(() => {
-        setLoading(false)
-      }, 1000)
+      setLoading(false)
     })
 
   }, [router.query])
