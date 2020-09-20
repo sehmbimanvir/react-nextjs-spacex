@@ -13,17 +13,13 @@ export const getServerSideProps = async (context) => {
   } catch (err) { }
 
   return {
-    props: {
-      items,
-      params: context.query,
-      init: 1
-    }
+    props: { items, params: context.query }
   }
 }
 
-const Home = ({ items, params, init }) => {
-  const [spaceItems, setItems] = useState([])
-  const [filters, setFilters] = useState({
+const Home = ({ items, params }) => {
+  const [spaceItems, setItems] = useState(items || [])
+  const [filters, setFilters] = useState(params || {
     launch_year: '',
     launch_success: '',
     land_success: ''
@@ -31,16 +27,15 @@ const Home = ({ items, params, init }) => {
   const [loading, setLoading] = useState(false)
 
   const router = useRouter()
-  const initialRender = useRef(init)
+  const firstRun = useRef(true)
 
   useEffect(() => {
-    setFilters(params)
-    setItems(items)
+    document.title = 'SpaceX Launch Programs'
   }, [])
 
   useEffect(() => {
-    if (initialRender.current) {
-      initialRender.current = 0
+    if (firstRun.current) {
+      firstRun.current = false
       return
     }
     setLoading(true)
@@ -49,7 +44,7 @@ const Home = ({ items, params, init }) => {
       setLoading(false)
     })
 
-  }, [router.query])
+  }, [filters])
 
   const contextValue = {
     setFilter: e => {
