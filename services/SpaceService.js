@@ -18,10 +18,11 @@ export const SpaceService = {
 
   getData (items) {
     return items.map((
-      { flight_number, mission_name, mission_id: missions, launch_year, launch_success, links: { mission_patch_small: thumbnail } }
+      { flight_number, mission_name, mission_id: missions, launch_year, launch_success, links: { mission_patch_small: thumbnail }, rocket }
     ) => {
+      let land_success = rocket.first_stage.cores.some(item => item.land_success)
       return {
-        flight_number, mission_name, missions, launch_year, launch_success, thumbnail
+        flight_number, mission_name, missions, launch_year, launch_success, thumbnail, land_success
       }
     })
   }
